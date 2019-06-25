@@ -14,15 +14,42 @@ RUN set -eux; \
 # Default to UTF-8 file.encoding
 ENV LANG en_US.UTF-8
 
-ENV JAVA_HOME /usr/java/openjdk-14
+ENV JAVA_HOME_14 /usr/java/openjdk-14
+ENV PATH $JAVA_HOME_14/bin:$PATH
+ENV JAVA_HOME /usr/java/openjdk-12
 ENV PATH $JAVA_HOME/bin:$PATH
 
 # https://jdk.java.net/
-ENV JAVA_VERSION 14
-ENV JAVA_URL https://download.java.net/java/early_access/jpackage/8/openjdk-14-jpackage+8_linux-x64_bin.tar.gz
-ENV JAVA_SHA256 1d549f3ba636a97ff236203729b527b7f2f027bf72d034681168eb4d0c2acfb1
+ENV JAVA_VERSION_14 14
+ENV JAVA_URL_14 https://download.java.net/java/early_access/jpackage/8/openjdk-14-jpackage+8_linux-x64_bin.tar.gz
+ENV JAVA_SHA256_14 1d549f3ba636a97ff236203729b527b7f2f027bf72d034681168eb4d0c2acfb1
+ENV JAVA_VERSION 12.0.1
+ENV JAVA_URL https://download.java.net/java/GA/jdk12.0.1/69cfe15208a647278a19ef0990eea691/12/GPL/openjdk-12.0.1_linux-x64_bin.tar.gz
+ENV JAVA_SHA256 151eb4ec00f82e5e951126f572dc9116104c884d97f91be14ec11e85fc2dd626
+
 
 RUN set -eux; \
+	\
+	curl -fL -o /openjdk.tgz "$JAVA_URL_14"; \
+	echo "$JAVA_SHA256_14 */openjdk.tgz" | sha256sum -c -; \
+	mkdir -p "$JAVA_HOME_14"; \
+	tar --extract --file /openjdk.tgz --directory "$JAVA_HOME_14" --strip-components 1; \
+	rm /openjdk.tgz; \
+	\
+# https://github.com/oracle/docker-images/blob/a56e0d1ed968ff669d2e2ba8a1483d0f3acc80c0/OracleJava/java-8/Dockerfile#L17-L19
+	ln -sfT "$JAVA_HOME_14" /usr/java/default; \
+	ln -sfT "$JAVA_HOME_14" /usr/java/latest; \
+	for bin in "$JAVA_HOME_14/bin/"*; do \
+		base="$(basename "$bin")"; \
+		[ ! -e "/usr/bin/$base" ]; \
+		alternatives --install "/usr/bin/$base" "$base" "$bin" 20000; \
+	done; \
+	\
+# https://github.com/docker-library/openjdk/issues/212#issuecomment-420979840
+# https://openjdk.java.net/jeps/341
+	java -Xshare:dump; \
+	\
+	set -eux; \
 	\
 	curl -fL -o /openjdk.tgz "$JAVA_URL"; \
 	echo "$JAVA_SHA256 */openjdk.tgz" | sha256sum -c -; \
@@ -46,6 +73,7 @@ RUN set -eux; \
 # basic smoke test
 	java --version; \
 	javac --version; \
+# basic smoke test
     jpackage --help
 
 
