@@ -25,9 +25,9 @@ ENV JAVA_VERSION 12.0.1
 ENV JAVA_URL https://download.java.net/java/GA/jdk12.0.1/69cfe15208a647278a19ef0990eea691/12/GPL/openjdk-12.0.1_linux-x64_bin.tar.gz
 ENV JAVA_SHA256 151eb4ec00f82e5e951126f572dc9116104c884d97f91be14ec11e85fc2dd626
 # openjdk14
-ENV JAVA_VERSION_14 14
-ENV JAVA_URL_14 https://download.java.net/java/early_access/jpackage/8/openjdk-14-jpackage+8_linux-x64_bin.tar.gz
-ENV JAVA_SHA256_14 1d549f3ba636a97ff236203729b527b7f2f027bf72d034681168eb4d0c2acfb1
+
+ENV JAVA_URL_14 https://download.java.net/java/early_access/jpackage/8/openjdk-14-jpackage+8_osx-x64_bin.tar.gz
+ENV JAVA_SHA256_14 b21f6d5149f960bd78762153b3cd213e985ed089a68d14c86373a51e60d4538e
 
 RUN set -eux; \
 	\
@@ -47,24 +47,6 @@ RUN set -eux; \
 		alternatives --install "/usr/bin/$base" "$base" "$bin" 20000; \
 	done; \
 	\
-# https://github.com/docker-library/openjdk/issues/212#issuecomment-420979840
-# https://openjdk.java.net/jeps/341
-	java -Xshare:dump; \
-	\
-	curl -fL -o /openjdk.tgz "$JAVA_URL_14"; \
-	echo "$JAVA_SHA256_14 */openjdk.tgz" | sha256sum -c -; \
-	echo "installing JAVA "${JAVA_VERSION_14}; \
-	mkdir -p "$JAVA_HOME_14"; \
-	tar --extract --file /openjdk.tgz --directory "$JAVA_HOME_14" --strip-components 1; \
-	rm /openjdk.tgz; \
-	\
-# https://github.com/oracle/docker-images/blob/a56e0d1ed968ff669d2e2ba8a1483d0f3acc80c0/OracleJava/java-8/Dockerfile#L17-L19
-#	for bin in "$JAVA_HOME_14/bin/"*; do \
-#		base="$(basename "$bin")"; \
-#		[ ! -e "/usr/bin/$base" ]; \
-#		alternatives --install "/usr/bin/$base" "$base" "$bin" 19000; \
-#	done; \
-#	\
 # https://github.com/docker-library/openjdk/issues/212#issuecomment-420979840
 # https://openjdk.java.net/jeps/341
 	java -Xshare:dump; \
