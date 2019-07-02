@@ -12,7 +12,7 @@ RUN set -eux; \
 		unzip \
 		make \
 		yum-utils \
-		yum-config-manager --enable *EPEL \
+		yum-config-manager --enablerepo *EPEL \
 		python36 \
 	; \
 	rm -rf /var/cache/yum
