@@ -8,6 +8,12 @@ RUN set -eux; \
 # java.lang.UnsatisfiedLinkError: /usr/java/openjdk-12/lib/libfontmanager.so: libfreetype.so.6: cannot open shared object file: No such file or directory
 # https://github.com/docker-library/openjdk/pull/235#issuecomment-424466077
 		freetype fontconfig \
+		oracle-epel-release-el7 \
+		unzip \
+		make \
+		yum-utils \
+		yum-config-manager --enable *EPEL \
+		python36 \
 	; \
 	rm -rf /var/cache/yum
 
